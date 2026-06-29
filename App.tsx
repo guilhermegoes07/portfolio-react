@@ -154,7 +154,7 @@ const portfolioCopy = {
       title: "Vamos Conversar?",
       pitch:
         "Aberto a oportunidades em mobile, fintech, healthtech e projetos com integração nativa em Flutter, Kotlin e Swift.",
-      details: ["Telefone: 18981724728", "LinkedIn: linkedin.com/in/guilherme-santiago-goes", "Portfólio: portfolio.santiagos.tech"],
+      details: ["Telefone: +55 (18) 98172-4728", "LinkedIn: linkedin.com/in/guilherme-santiago-goes"],
     },
     footer: "Todos os direitos reservados.",
   },
@@ -285,7 +285,7 @@ const portfolioCopy = {
       title: "Let's Talk?",
       pitch:
         "Open to opportunities in mobile, fintech, healthtech, and projects with native Flutter, Kotlin, and Swift integrations.",
-      details: ["Phone: 18981724728", "LinkedIn: linkedin.com/in/guilherme-santiago-goes", "Portfolio: portfolio.santiagos.tech"],
+      details: ["Phone: +55 (18) 98172-4728", "LinkedIn: linkedin.com/in/guilherme-santiago-goes"],
     },
     footer: "All rights reserved.",
   },

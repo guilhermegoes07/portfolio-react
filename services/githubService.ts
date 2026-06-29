@@ -15,9 +15,15 @@ const GITHUB_USERNAME = 'guilhermegoes07'; // Updated GitHub username
 const mockPinnedRepos = {
   pt: [
     {
+      name: 'changelog-saas-front',
+      description: 'Frontend da plataforma de gerenciamento de changelogs, construído com Flutter. Funciona como um dashboard moderno e responsivo para gerenciar projetos e versões de changelog, com otimização para web e desktop.',
+      homepage: 'https://github.com/guilhermegoes07/changelog-saas-front',
+      topics: ['flutter', 'dart', 'dashboard', 'saas', 'web', 'desktop'],
+    },
+    {
       name: 'Flutter User API',
       description: 'Este projeto é a solução para o Desafio Técnico - Desenvolvedor(a) Flutter proposto pela Bus2. O objetivo é criar um aplicativo que consome a API pública randomuser.me para exibir, salvar e gerenciar perfis de usuários aleatórios.',
-      homepage: null,
+      homepage: 'https://github.com/guilhermegoes07/flutter-user-api',
       topics: ['flutter', 'dart', 'api', 'randomuser', 'mobile'],
     },
     {
@@ -47,9 +53,15 @@ const mockPinnedRepos = {
   ],
   en: [
     {
+      name: 'changelog-saas-front',
+      description: 'Frontend for the changelog management platform, built with Flutter. It works as a modern, responsive dashboard for managing changelog projects and releases, optimized for web and desktop.',
+      homepage: 'https://github.com/guilhermegoes07/changelog-saas-front',
+      topics: ['flutter', 'dart', 'dashboard', 'saas', 'web', 'desktop'],
+    },
+    {
       name: 'Flutter User API',
       description: 'This project is the solution for the Flutter Developer technical challenge proposed by Bus2. The goal is to build an app that consumes the public randomuser.me API to display, save, and manage random user profiles.',
-      homepage: null,
+      homepage: 'https://github.com/guilhermegoes07/flutter-user-api',
       topics: ['flutter', 'dart', 'api', 'randomuser', 'mobile'],
     },
     {
