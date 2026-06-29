@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import { Repo } from "./types";
 import { fetchPinnedRepos, type Locale } from "./services/githubService";
@@ -462,46 +462,145 @@ const SkillsSection: React.FC = () => {
 
 // Experience Section Component
 const ExperienceSection: React.FC = () => {
+  const carouselRef = useRef<HTMLDivElement | null>(null);
+  const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const scrollToIndex = (index: number) => {
+    const container = carouselRef.current;
+    const card = cardRefs.current[index];
+
+    if (!container || !card) {
+      return;
+    }
+
+    container.scrollTo({
+      left: card.offsetLeft - container.offsetLeft,
+      behavior: "smooth",
+    });
+    setActiveIndex(index);
+  };
+
+  const handleScroll = () => {
+    const container = carouselRef.current;
+
+    if (!container) {
+      return;
+    }
+
+    const containerCenter = container.scrollLeft + container.clientWidth / 2;
+    let nextIndex = 0;
+    let nextDistance = Number.POSITIVE_INFINITY;
+
+    cardRefs.current.forEach((card, index) => {
+      if (!card) {
+        return;
+      }
+
+      const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+      const distance = Math.abs(cardCenter - containerCenter);
+
+      if (distance < nextDistance) {
+        nextDistance = distance;
+        nextIndex = index;
+      }
+    });
+
+    setActiveIndex(nextIndex);
+  };
+
   return (
-    <section id="experience" className="py-20 md:py-32">
+    <section id="experience" className="py-20 md:py-32 bg-black bg-opacity-20">
       <div className="container mx-auto px-4 sm:px-6">
-        <SectionTitle>{copy.experienceTitle}</SectionTitle>
-        <div className="relative max-w-2xl mx-auto">
-          <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-gray-700"></div>
+        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between mb-10">
+          <div className="max-w-2xl">
+            <SectionTitle>{copy.experienceTitle}</SectionTitle>
+            <p className="-mt-2 text-center text-gray-400">
+              Carrossel horizontal com os principais capítulos da trajetória.
+            </p>
+          </div>
+          <div className="flex items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => scrollToIndex(Math.max(activeIndex - 1, 0))}
+              disabled={activeIndex === 0}
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-gray-700 bg-gray-900 bg-opacity-70 text-gray-200 transition duration-300 hover:border-primary-purple hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+              aria-label="Experiência anterior"
+            >
+              <span className="text-2xl leading-none">‹</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => scrollToIndex(Math.min(activeIndex + 1, copy.experiences.length - 1))}
+              disabled={activeIndex === copy.experiences.length - 1}
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-gray-700 bg-gray-900 bg-opacity-70 text-gray-200 transition duration-300 hover:border-primary-purple hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+              aria-label="Próxima experiência"
+            >
+              <span className="text-2xl leading-none">›</span>
+            </button>
+          </div>
+        </div>
+        <div className="mb-6 flex items-center justify-center gap-2">
+          {copy.experiences.map((_, index) => (
+            <button
+              key={index}
+              type="button"
+              onClick={() => scrollToIndex(index)}
+              className={`h-2.5 rounded-full transition-all duration-300 ${
+                index === activeIndex
+                  ? "w-8 bg-gradient-to-r from-primary-purple to-neon-pink"
+                  : "w-2.5 bg-gray-700 hover:bg-gray-500"
+              }`}
+              aria-label={`Ir para experiência ${index + 1}`}
+              aria-pressed={index === activeIndex}
+            />
+          ))}
+        </div>
+        <div
+          ref={carouselRef}
+          onScroll={handleScroll}
+          className="flex gap-6 overflow-x-auto pb-4 pt-2 snap-x snap-mandatory scroll-smooth"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
           {copy.experiences.map((exp, index) => (
-            <div key={index} className="mb-12 flex items-center w-full">
-              <div
-                className={`order-1 w-5/12 ${
-                  index % 2 === 0 ? "text-right" : "text-left"
-                }`}
-              ></div>
-              <div className="z-10 flex items-center order-1 bg-primary-purple shadow-xl w-8 h-8 rounded-full">
-                <CodeIcon className="w-5 h-5 mx-auto text-white" />
-              </div>
-              <div
-                className={`order-1 bg-gray-900 bg-opacity-50 rounded-lg shadow-xl w-5/12 p-6 border border-gray-700 ${
-                  index % 2 === 0 ? "ml-4" : "mr-4 text-right"
-                }`}
-              >
-                <h3 className="mb-2 font-bold text-highlight-purple text-xl">
-                  {exp.role}
-                </h3>
-                <p className="text-sm font-semibold text-gray-400 mb-2">
-                  {exp.company} | {exp.period}
+            <article
+              key={index}
+              ref={(element) => {
+                cardRefs.current[index] = element;
+              }}
+              className="relative min-w-[88%] snap-start sm:min-w-[70%] lg:min-w-[48%] xl:min-w-[38%]"
+            >
+              <div className="h-full rounded-2xl border border-gray-700 bg-gray-900 bg-opacity-55 p-6 shadow-xl transition duration-300 hover:-translate-y-1 hover:border-primary-purple md:p-8">
+                <div className="mb-6 flex items-start justify-between gap-4">
+                  <div>
+                    <p className="mb-2 inline-flex items-center gap-2 rounded-full border border-gray-700 bg-black bg-opacity-30 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-gray-400">
+                      <CodeIcon className="h-4 w-4 text-primary-purple" />
+                      {String(index + 1).padStart(2, "0")} / {String(copy.experiences.length).padStart(2, "0")}
+                    </p>
+                    <h3 className="text-2xl font-bold text-highlight-purple">
+                      {exp.role}
+                    </h3>
+                  </div>
+                  <span className="rounded-full border border-primary-purple/40 bg-primary-purple/10 px-3 py-1 text-xs font-semibold text-primary-purple">
+                    {index === activeIndex ? "Ativo" : ""}
+                  </span>
+                </div>
+                <p className="mb-6 text-sm font-semibold uppercase tracking-[0.18em] text-gray-400">
+                  {exp.company}
                 </p>
-                <ul
-                  className={`list-none text-sm text-gray-300 ${
-                    index % 2 !== 0 ? "text-right" : "text-left"
-                  }`}
-                >
+                <div className="mb-6 inline-flex rounded-full border border-gray-700 bg-black bg-opacity-30 px-4 py-2 text-sm text-gray-300">
+                  {exp.period}
+                </div>
+                <ul className="space-y-4 text-sm leading-relaxed text-gray-300">
                   {exp.highlights.map((h, i) => (
-                    <li key={i} className="mb-2">
-                      {h}
+                    <li key={i} className="flex gap-3">
+                      <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-gradient-to-r from-primary-purple to-neon-pink" />
+                      <span>{h}</span>
                     </li>
                   ))}
                 </ul>
               </div>
-            </div>
+            </article>
           ))}
         </div>
       </div>
