@@ -515,9 +515,6 @@ const ExperienceSection: React.FC = () => {
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between mb-10">
           <div className="max-w-2xl">
             <SectionTitle>{copy.experienceTitle}</SectionTitle>
-            <p className="-mt-2 text-center text-gray-400">
-              Carrossel horizontal com os principais capítulos da trajetória.
-            </p>
           </div>
           <div className="flex items-center justify-center gap-3">
             <button
