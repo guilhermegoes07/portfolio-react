@@ -2,7 +2,7 @@ import React from "react";
 import { useState, useEffect } from "react";
 
 import { Repo } from "./types";
-import { fetchPinnedRepos } from "./services/githubService";
+import { fetchPinnedRepos, type Locale } from "./services/githubService";
 
 // FIX: Imported `ExternalLinkIcon` to be used in the ProjectCard component.
 import {
@@ -13,6 +13,288 @@ import {
   MailIcon,
   ExternalLinkIcon,
 } from "./components/icons";
+
+const getPreferredLocale = (): Locale => {
+  if (typeof navigator === "undefined") {
+    return "pt";
+  }
+
+  return navigator.language.toLowerCase().startsWith("pt") ? "pt" : "en";
+};
+
+const portfolioCopy = {
+  pt: {
+    navLinks: [
+      { href: "#about", label: "Sobre" },
+      { href: "#skills", label: "Competências" },
+      { href: "#experience", label: "Experiência" },
+      { href: "#projects", label: "Projetos" },
+      { href: "#education", label: "Formação" },
+      { href: "#contact", label: "Contato" },
+    ],
+    home: {
+      title: "Engenheiro de Software Mobile | Especialista em Flutter | Desenvolvedor com IA",
+      subtitle:
+        "7+ anos entregando soluções mobile, fintech e healthtech com Clean Architecture, SDD e integrações nativas em Swift e Kotlin.",
+      primaryAction: "Meus Projetos",
+      secondaryAction: "Contato",
+    },
+    about: {
+      title: "Sobre Mim",
+      body:
+        "Sou Mobile Software Engineer com 7 anos de experiência prática em desenvolvimento de software, com foco em aplicações mobile de alta performance e arquiteturas escaláveis. Minha trajetória une base Fullstack e especialização em Flutter, com atuação forte em integrações nativas em Kotlin e Swift, comunicação com hardwares e sistemas transacionais em fintech. Trabalho com Clean Architecture, gerência de estado avançada e automação de CI/CD para entregar código testável, sustentável e pronto para produção.",
+    },
+    skillsTitle: "Competências",
+    skills: [
+      {
+        category: "Linguagens",
+        items: ["Dart", "Kotlin", "Java", "Swift", "PHP", "Node.js", "JavaScript", "SQL"],
+      },
+      {
+        category: "Mobile",
+        items: [
+          "Flutter (Bloc, Cubit, Riverpod, GetX)",
+          "Android Nativo SDK",
+          "iOS SDK",
+          "Integração com SDKs nativas",
+        ],
+      },
+      {
+        category: "Backend",
+        items: ["Laravel", "Symfony", "PHP", "APIs RESTful", "WebSockets"],
+      },
+      {
+        category: "DevOps & Cloud",
+        items: ["CI/CD (CodeMagic, GitHub Actions)", "Docker", "App Store & Google Play"],
+      },
+      {
+        category: "Arquitetura & Testes",
+        items: ["Clean Architecture", "SDD", "Testes Unitários", "Testes de UI"],
+      },
+      {
+        category: "Dados & Automação",
+        items: ["SQLite", "Hive", "Logging", "Automação de processos"],
+      },
+      {
+        category: "Idiomas",
+        items: [
+          "Português (Native or Bilingual)",
+          "English (Full Professional)",
+          "Spanish (Limited Working)",
+        ],
+      },
+    ],
+    experienceTitle: "Experiência",
+    experiences: [
+      {
+        role: "FullStack & Mobile Developer",
+        company: "Data Core Solutions Services",
+        period: "outubro de 2025 - Atualmente",
+        highlights: [
+          "Concepção e entrega de um aplicativo mobile de alta performance para uma rede de academias, usando Cubit para estado e Dio para consumo eficiente de APIs.",
+          "Arquitetura de comunicação em tempo real com WebSockets, Firebase Cloud Messaging e Bloc para fluxos complexos de dados.",
+          "Automatização de esteiras de CI/CD para distribuição na App Store e Google Play e evolução de ecossistema web com PHP Symfony.",
+        ],
+      },
+      {
+        role: "Mobile Developer",
+        company: "Multiplus Card Brasil",
+        period: "maio de 2025 - outubro de 2025",
+        highlights: [
+          "Integração de soluções de TEF em Flutter e Dart para terminais POS e dispositivos móveis, com customização de SDKs nativas de adquirentes.",
+          "Estruturação de comunicação com APIs REST e WebSockets, aplicando padrões rigorosos de segurança de dados e logging para ambientes transacionais.",
+          "Desenvolvimento de funcionalidades nativas Android para garantir interoperabilidade total entre Java/Kotlin e o código em Flutter.",
+        ],
+      },
+      {
+        role: "Fullstack & Mobile Developer",
+        company: "Kamay",
+        period: "junho de 2024 - maio de 2025",
+        highlights: [
+          "Desenvolvimento de soluções para HealthTech com foco em otimização do fluxo de centros cirúrgicos e permanência de pacientes.",
+          "Construção de painéis administrativos com JavaScript, Blade e Tailwind, estruturando a arquitetura backend em Laravel.",
+          "Evolução do ecossistema móvel em Flutter, com deploy via CodeMagic e publicação nas lojas.",
+        ],
+      },
+      {
+        role: "Fullstack & Mobile Developer",
+        company: "Santiago Soluções Tech",
+        period: "outubro de 2022 - maio de 2024",
+        highlights: [
+          "Liderança técnica em consultoria própria, orquestrando arquitetura e entrega de produtos digitais escaláveis para clientes B2B.",
+          "Desenvolvimento de apps multiplataforma para Candor Studios e franquias de grande porte com Flutter, Riverpod, BLoC e GetX.",
+          "Implementação de abordagens offline-first com SQLite e Hive, além de pipelines de CI/CD e soluções como automação, e-commerce e chatbots.",
+        ],
+      },
+      {
+        role: "Desenvolvedor Freelancer",
+        company: "DevRoom",
+        period: "março de 2019 - outubro de 2022",
+        highlights: [
+          "Atuação autônoma focada na construção de ecossistemas digitais do zero, com desafios de lógica, arquitetura e escalabilidade.",
+          "Desenvolvimento fullstack de aplicação multiplataforma com economia in-game, mecânicas sociais e interação em tempo real.",
+          "Concepção de sistema dinâmico de posicionamento de jogadores com minimapa síncrono em tempo real.",
+        ],
+      },
+    ],
+    projectsTitle: "Projetos em Destaque",
+    projectsLoading: "Carregando projetos...",
+    projectsError: "Falha ao carregar os projetos.",
+    educationTitle: "Formação",
+    education: [
+      "Bacharelado, Computer Software Engineering - Centro Universitário UniFatecie (maio de 2026 - maio de 2030)",
+      "Associate's degree, Inteligência Artificial e Machine Learning - Centro Universitário UniFatecie (maio de 2026 - maio de 2028)",
+      "Bacharelado (Incompleto), Computer Science - UNESP (março de 2024 - julho de 2025)",
+      "Certificação: Desenvolvimento Android 2018",
+      "Certificação: 2º Delphi Noroeste Paulista",
+      "Certificação: Desenvolvimento Web Completo - 20 cursos + 20 projetos",
+      "Honorable Mention - Olimpíada Brasileira de Matemática das Escolas Públicas",
+    ],
+    contact: {
+      title: "Vamos Conversar?",
+      pitch:
+        "Aberto a oportunidades em mobile, fintech, healthtech e projetos com integração nativa em Flutter, Kotlin e Swift.",
+      details: ["Telefone: 18981724728", "LinkedIn: linkedin.com/in/guilherme-santiago-goes", "Portfólio: portfolio.santiagos.tech"],
+    },
+    footer: "Todos os direitos reservados.",
+  },
+  en: {
+    navLinks: [
+      { href: "#about", label: "About" },
+      { href: "#skills", label: "Skills" },
+      { href: "#experience", label: "Experience" },
+      { href: "#projects", label: "Projects" },
+      { href: "#education", label: "Education" },
+      { href: "#contact", label: "Contact" },
+    ],
+    home: {
+      title: "Mobile Software Engineer | Flutter Specialist | AI-Boosted Developer",
+      subtitle:
+        "7+ years delivering mobile, fintech, and healthtech solutions with Clean Architecture, SDD, and native Swift and Kotlin integrations.",
+      primaryAction: "My Projects",
+      secondaryAction: "Contact",
+    },
+    about: {
+      title: "About Me",
+      body:
+        "I am a Mobile Software Engineer with 7 years of hands-on software experience, focused on high-performance mobile apps and scalable architectures. My background combines Fullstack roots with strong Flutter specialization, including native Kotlin and Swift integrations, hardware communication, and transaction systems in fintech. I work with Clean Architecture, advanced state management, and CI/CD automation to deliver testable, maintainable, production-ready code.",
+    },
+    skillsTitle: "Skills",
+    skills: [
+      {
+        category: "Programming Languages",
+        items: ["Dart", "Kotlin", "Java", "Swift", "PHP", "Node.js", "JavaScript", "SQL"],
+      },
+      {
+        category: "Mobile",
+        items: [
+          "Flutter (Bloc, Cubit, Riverpod, GetX)",
+          "Native Android SDK",
+          "iOS SDK",
+          "Native SDK integration",
+        ],
+      },
+      {
+        category: "Backend",
+        items: ["Laravel", "Symfony", "PHP", "RESTful APIs", "WebSockets"],
+      },
+      {
+        category: "DevOps & Cloud",
+        items: ["CI/CD (CodeMagic, GitHub Actions)", "Docker", "App Store & Google Play"],
+      },
+      {
+        category: "Architecture & Testing",
+        items: ["Clean Architecture", "SDD", "Unit Tests", "UI Tests"],
+      },
+      {
+        category: "Data & Automation",
+        items: ["SQLite", "Hive", "Logging", "Process automation"],
+      },
+      {
+        category: "Spoken Languages",
+        items: ["Portuguese (Native or Bilingual)", "English (Full Professional)", "Spanish (Limited Working)"],
+      },
+    ],
+    experienceTitle: "Experience",
+    experiences: [
+      {
+        role: "FullStack & Mobile Developer",
+        company: "Data Core Solutions Services",
+        period: "Oct 2025 - Present",
+        highlights: [
+          "Designed and delivered a high-performance mobile app for a gym network, using Cubit for state management and Dio for efficient API consumption.",
+          "Built real-time communication architecture with WebSockets, Firebase Cloud Messaging, and Bloc for complex data flows.",
+          "Automated CI/CD pipelines for App Store and Google Play distribution and evolved the web ecosystem with PHP Symfony.",
+        ],
+      },
+      {
+        role: "Mobile Developer",
+        company: "Multiplus Card Brasil",
+        period: "May 2025 - Oct 2025",
+        highlights: [
+          "Integrated TEF solutions in Flutter and Dart for POS terminals and mobile devices, customizing native acquirer SDKs.",
+          "Structured REST and WebSocket communication with strict data security and logging practices for transactional environments.",
+          "Built native Android features to ensure full interoperability between Java/Kotlin libraries and the Flutter codebase.",
+        ],
+      },
+      {
+        role: "Fullstack & Mobile Developer",
+        company: "Kamay",
+        period: "Jun 2024 - May 2025",
+        highlights: [
+          "Developed HealthTech solutions focused on optimizing surgical center workflows and patient stay management.",
+          "Built administrative dashboards with JavaScript, Blade, and Tailwind while structuring the backend architecture in Laravel.",
+          "Advanced the mobile ecosystem in Flutter, handling deployment through CodeMagic and app store publication.",
+        ],
+      },
+      {
+        role: "Fullstack & Mobile Developer",
+        company: "Santiago Soluções Tech",
+        period: "Oct 2022 - May 2024",
+        highlights: [
+          "Led a self-owned technology consultancy, orchestrating architecture and delivery of scalable digital products for B2B clients.",
+          "Built multiplatform apps for Candor Studios and large franchises with Flutter, Riverpod, BLoC, and GetX.",
+          "Implemented offline-first approaches with SQLite and Hive, along with CI/CD pipelines and solutions such as automation, e-commerce, and chatbots.",
+        ],
+      },
+      {
+        role: "Freelance Developer",
+        company: "DevRoom",
+        period: "Mar 2019 - Oct 2022",
+        highlights: [
+          "Worked independently on digital ecosystems from scratch, facing logic, architecture, and scalability challenges.",
+          "Engineered a fullstack multiplatform game application with in-game economy, social mechanics, and real-time interaction.",
+          "Designed a dynamic player positioning system integrated with a real-time synchronized minimap.",
+        ],
+      },
+    ],
+    projectsTitle: "Featured Projects",
+    projectsLoading: "Loading projects...",
+    projectsError: "Failed to load projects.",
+    educationTitle: "Education",
+    education: [
+      "Bachelor's degree, Computer Software Engineering - Centro Universitário UniFatecie (May 2026 - May 2030)",
+      "Associate's degree, Artificial Intelligence and Machine Learning - Centro Universitário UniFatecie (May 2026 - May 2028)",
+      "Bachelor's degree (Incomplete), Computer Science - UNESP (Mar 2024 - Jul 2025)",
+      "Certification: Android Development 2018",
+      "Certification: 2nd Delphi Noroeste Paulista",
+      "Certification: Complete Web Development - 20 courses + 20 projects",
+      "Honorable Mention - Brazilian Public Schools Mathematics Olympiad",
+    ],
+    contact: {
+      title: "Let's Talk?",
+      pitch:
+        "Open to opportunities in mobile, fintech, healthtech, and projects with native Flutter, Kotlin, and Swift integrations.",
+      details: ["Phone: 18981724728", "LinkedIn: linkedin.com/in/guilherme-santiago-goes", "Portfolio: portfolio.santiagos.tech"],
+    },
+    footer: "All rights reserved.",
+  },
+} as const;
+
+type PortfolioCopy = (typeof portfolioCopy)[Locale];
+
+const locale = getPreferredLocale();
+const copy = portfolioCopy[locale];
 
 // Helper component for section titles
 const SectionTitle: React.FC<{ children: React.ReactNode }> = ({
@@ -29,6 +311,7 @@ const SectionTitle: React.FC<{ children: React.ReactNode }> = ({
 // Header Component
 const Header: React.FC = () => {
   const [top, setTop] = useState(true);
+  const navLinks = copy.navLinks;
 
   useEffect(() => {
     const scrollHandler = () => {
@@ -37,15 +320,6 @@ const Header: React.FC = () => {
     window.addEventListener("scroll", scrollHandler);
     return () => window.removeEventListener("scroll", scrollHandler);
   }, [top]);
-
-  const navLinks = [
-    { href: "#about", label: "Sobre" },
-    { href: "#skills", label: "Ferramentas" },
-    { href: "#experience", label: "Experiência" },
-    { href: "#projects", label: "Projetos" },
-    { href: "#education", label: "Formação" },
-    { href: "#contact", label: "Contato" },
-  ];
 
   return (
     <header
@@ -100,23 +374,23 @@ const HomeSection: React.FC = () => (
         Guilherme Santiago
       </h1>
       <h2 className="text-xl md:text-2xl font-semibold text-gray-300 mb-8">
-        Desenvolvedor Mobile | Especialista Flutter, Android Nativo & iOS
+        {copy.home.title}
       </h2>
       <p className="max-w-2xl mx-auto text-lg text-gray-400 mb-10">
-        Transformando ideias em soluções mobile seguras e de alta performance.
+        {copy.home.subtitle}
       </p>
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
         <a
           href="#projects"
           className="bg-primary-purple text-white font-bold py-3 px-8 rounded-full hover:bg-highlight-purple transition duration-300 transform hover:scale-105"
         >
-          Meus Projetos
+          {copy.home.primaryAction}
         </a>
         <a
           href="#contact"
           className="bg-transparent border-2 border-highlight-purple text-highlight-purple font-bold py-3 px-8 rounded-full hover:bg-highlight-purple hover:text-white transition duration-300 transform hover:scale-105"
         >
-          Contato
+          {copy.home.secondaryAction}
         </a>
       </div>
       <div className="flex justify-center space-x-6 mt-12">
@@ -145,20 +419,9 @@ const HomeSection: React.FC = () => (
 const AboutSection: React.FC = () => (
   <section id="about" className="py-20 md:py-32">
     <div className="container mx-auto px-4 sm:px-6">
-      <SectionTitle>Sobre Mim</SectionTitle>
+      <SectionTitle>{copy.about.title}</SectionTitle>
       <div className="max-w-3xl mx-auto text-center text-lg text-gray-300 leading-relaxed">
-        <p>
-          Desenvolvedor de Software com mais de 6 anos de experiência,
-          especializado no ciclo completo de desenvolvimento de aplicações
-          mobile para iOS e Android, com foco principal em Flutter. Possuo
-          sólida vivência no setor de pagamentos e fintech, desenvolvendo
-          soluções seguras e de alta performance. Minha experiência abrange
-          desde a arquitetura de software com padrões como MVVM e Clean
-          Architecture, até o desenvolvimento de backends robustos com Python,
-          Java e Node.js, e a automação de processos de CI/CD. Sou um
-          profissional com fortes habilidades de resolução de problemas,
-          habituado a ambientes de desenvolvimento dinâmicos e colaborativos.
-        </p>
+        <p>{copy.about.body}</p>
       </div>
     </div>
   </section>
@@ -166,52 +429,12 @@ const AboutSection: React.FC = () => (
 
 // Skills Section Component
 const SkillsSection: React.FC = () => {
-  const skills = {
-    Linguagens: [
-      "Dart",
-      "Kotlin",
-      "Java",
-      "Swift",
-      "Objective-C",
-      "Python",
-      "PHP",
-      "Node.js",
-      "JavaScript",
-      "SQL",
-    ],
-    Mobile: [
-      "Flutter (Riverpod, BLoC, Provider, GetX)",
-      "Android Nativo SDK",
-      "iOS SDK",
-    ],
-    Backend: [
-      "Python (Flask, Django)",
-      "Node.js",
-      "PHP (Laravel)",
-      "APIs RESTful",
-      "WebSockets",
-    ],
-    "DevOps & Cloud": [
-      "CI/CD (CodeMagic, Jenkins, GitHub Actions)",
-      "Docker",
-      "AWS (EC2, S3, RDS)",
-    ],
-    "Arquitetura & Testes": [
-      "MVVM",
-      "MVC",
-      "Clean Architecture",
-      "Testes Unitários",
-      "Testes de UI",
-    ],
-    Idiomas: ["Inglês (Avançado/Fluente)", "Português (Nativo)"],
-  };
-
   return (
     <section id="skills" className="py-20 md:py-32 bg-black bg-opacity-20">
       <div className="container mx-auto px-4 sm:px-6">
-        <SectionTitle>Minhas Ferramentas</SectionTitle>
+        <SectionTitle>{copy.skillsTitle}</SectionTitle>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {Object.entries(skills).map(([category, items]) => (
+          {copy.skills.map(({ category, items }) => (
             <div
               key={category}
               className="bg-gray-900 bg-opacity-50 p-6 rounded-lg border border-gray-700 hover:border-primary-purple transition-all duration-300 transform hover:-translate-y-1"
@@ -239,54 +462,13 @@ const SkillsSection: React.FC = () => {
 
 // Experience Section Component
 const ExperienceSection: React.FC = () => {
-  const experiences = [
-    {
-      role: "Mobile Developer",
-      company: "Multiplus Card Brasil",
-      period: "junho de 2025 - Atualmente",
-      highlights: [
-        "Desenvolvimento de um módulo de pagamento em Flutter com integração via bridge com SDK nativo em Kotlin para terminais POS, otimizando o fluxo de transação.",
-        "Implementação de fluxo de transações TEF (Transferência Eletrônica de Fundos) seguindo padrões de segurança PCI e consumindo APIs REST.",
-      ],
-    },
-    {
-      role: "Fullstack & Mobile Developer",
-      company: "Autônomo",
-      period: "janeiro de 2019 - Atualmente",
-      highlights: [
-        "Criação de scripts em Python para automação de build e deploy (CI/CD), reduzindo o tempo manual em mais de 50%.",
-        "Manutenção de app legado com módulos em Objective-C e Java, garantindo interoperabilidade com novas features em Flutter.",
-        "Arquitetura de app e-commerce com Flutter, Clean Architecture e MVVM (Riverpod).",
-        "Diagnóstico e correção de memory leaks em app iOS com Xcode Instruments, melhorando a performance em 80%.",
-      ],
-    },
-    {
-      role: "Fullstack & Mobile Developer",
-      company: "Kamay",
-      period: "dezembro de 2024 - junho de 2025",
-      highlights: [
-        "Responsável pelo ciclo completo de publicação e manutenção de apps na App Store e Google Play.",
-        "Implementação de suíte de testes unitários (flutter_test) e de UI (integration_test), atingindo mais de 90% de cobertura de código.",
-      ],
-    },
-    {
-      role: "Fullstack & Mobile Developer",
-      company: "Fachini IT",
-      period: "Junho de 2024 - Dezembro de 2024",
-      highlights: [
-        "Atuação como desenvolvedor na FachiniIT, trabalhando em diversos projetos e linguagens, aprimorando expertise em desenvolvimento web e flutter.",
-        "Responsável pela manutenção e atualização de sistemas para diversas empresas, o que me providenciou uma atuação ampla, conhecendo várias regras de negócio.",
-      ],
-    },
-  ];
-
   return (
     <section id="experience" className="py-20 md:py-32">
       <div className="container mx-auto px-4 sm:px-6">
-        <SectionTitle>Experiência</SectionTitle>
+        <SectionTitle>{copy.experienceTitle}</SectionTitle>
         <div className="relative max-w-2xl mx-auto">
           <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-gray-700"></div>
-          {experiences.map((exp, index) => (
+          {copy.experiences.map((exp, index) => (
             <div key={index} className="mb-12 flex items-center w-full">
               <div
                 className={`order-1 w-5/12 ${
@@ -377,8 +559,8 @@ const ProjectsSection: React.FC<{
 }> = ({ repos, loading, error }) => (
   <section id="projects" className="py-20 md:py-32 bg-black bg-opacity-20">
     <div className="container mx-auto px-4 sm:px-6">
-      <SectionTitle>Projetos em Destaque</SectionTitle>
-      {loading && <p className="text-center">Carregando projetos...</p>}
+      <SectionTitle>{copy.projectsTitle}</SectionTitle>
+      {loading && <p className="text-center">{copy.projectsLoading}</p>}
       {error && <p className="text-center text-red-500">{error}</p>}
       {!loading && !error && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -393,20 +575,13 @@ const ProjectsSection: React.FC<{
 
 // Education Section Component
 const EducationSection: React.FC = () => {
-  const items = [
-    "Bacharelado, Tecnologia da Informação - Univesp (Cursando)",
-    "Bacharelado (Incompleto), Ciência da Computação - UNESP",
-    "Certificação: Desenvolvimento Android - 2018",
-    "Certificação: Desenvolvimento Web Completo: 20 cursos + 20 projetos",
-  ];
-
   return (
     <section id="education" className="py-20 md:py-32">
       <div className="container mx-auto px-4 sm:px-6">
-        <SectionTitle>Formação</SectionTitle>
+        <SectionTitle>{copy.educationTitle}</SectionTitle>
         <div className="max-w-2xl mx-auto">
           <ul className="space-y-4">
-            {items.map((item, index) => (
+            {copy.education.map((item, index) => (
               <li
                 key={index}
                 className="flex items-start p-4 bg-gray-900 bg-opacity-50 rounded-lg border border-gray-800"
@@ -426,11 +601,15 @@ const EducationSection: React.FC = () => {
 const ContactSection: React.FC = () => (
   <section id="contact" className="py-20 md:py-32 bg-black bg-opacity-20">
     <div className="container mx-auto px-4 sm:px-6 text-center">
-      <SectionTitle>Vamos Conversar?</SectionTitle>
+      <SectionTitle>{copy.contact.title}</SectionTitle>
       <p className="max-w-xl mx-auto text-lg text-gray-400 mb-8">
-        Estou aberto a novas oportunidades e projetos. Sinta-se à vontade para
-        entrar em contato.
+        {copy.contact.pitch}
       </p>
+      <div className="mb-8 text-gray-300 space-y-2">
+        {copy.contact.details.map((detail) => (
+          <p key={detail}>{detail}</p>
+        ))}
+      </div>
       <a
         href="mailto:gscog05@gmail.com"
         className="inline-flex items-center justify-center bg-primary-purple text-white font-bold py-3 px-8 rounded-full hover:bg-highlight-purple transition duration-300 transform hover:scale-105 text-lg"
@@ -465,8 +644,7 @@ const Footer: React.FC = () => (
   <footer className="py-6 bg-black bg-opacity-30">
     <div className="container mx-auto px-4 sm:px-6 text-center text-gray-500">
       <p>
-        &copy; {new Date().getFullYear()} Guilherme Santiago. Todos os direitos
-        reservados.
+        &copy; {new Date().getFullYear()} Guilherme Santiago. {copy.footer}
       </p>
     </div>
   </footer>
@@ -479,13 +657,17 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    document.documentElement.lang = locale;
+  }, []);
+
+  useEffect(() => {
     const loadRepos = async () => {
       try {
         setLoading(true);
-        const pinnedRepos = await fetchPinnedRepos();
+        const pinnedRepos = await fetchPinnedRepos(locale);
         setRepos(pinnedRepos);
       } catch (err) {
-        setError("Falha ao carregar os projetos.");
+        setError(copy.projectsError);
         console.error(err);
       } finally {
         setLoading(false);
